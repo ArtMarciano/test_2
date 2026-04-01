@@ -14,11 +14,17 @@ st.code("a = 123\n" \
 st.markdown('----')
 st.header("lets display some data")
 
-df = pd.read_csv('https://raw.githubusercontent.com/ArtMarciano/datasets/refs/heads/main/tips.csv')
-st.dataframe(df)
+@st.cache_data
+def load_data():
+    df = pd.read_csv('https://raw.githubusercontent.com/ArtMarciano/datasets/refs/heads/main/tips.csv')
+    df['tip_pct'] = df['tip'] / df['total_bill'] * 100
+    return df
+
+df = load_data()
 
 # Slider widget — returns the selected value
-tip_range = st.slider(
+st.sidebar.header("Filters")
+tip_range = st.sidebar.slider(
     'Filter by Tip amount',
     min_value=0.0,
     max_value=10.0,
@@ -29,6 +35,13 @@ tip_range = st.slider(
 filtered_df = df[df['tip'] <= tip_range]
 st.write(f'Showing {len(filtered_df)} rows')
 st.dataframe(filtered_df)
+with st.expander('About this dataset'):
+    st.write('''
+        This dataset contains 244 restaurant orders from a waiter
+        in the early 1990s. Columns include total bill, tip amount,
+        smoker status, day of the week, meal time, and party size.
+    ''')
+    
 
 
 
@@ -47,15 +60,26 @@ st.pyplot(fig)
 
 # Add this after the slider line:
 
-meal = st.radio(
+meal = st.sidebar.radio(
     'Select meal time',
     ('All', 'Lunch', 'Dinner')
 )
+
+
 
 # Update the filter to use both widgets:
 filtered_df = df[df['tip'] <= tip_range]
 if meal != 'All':
     filtered_df = filtered_df[filtered_df['time'] == meal]
+
+
+# You can also add a selectbox for day of week:
+day = st.sidebar.selectbox(
+    'Day of week',
+    ('All', 'Thur', 'Fri', 'Sat', 'Sun')
+)
+if day != 'All':
+    filtered_df = filtered_df[filtered_df['day'] == day]
 
 # Add this right after filtered_df is created:
 
@@ -77,7 +101,7 @@ col3.metric(
     value=f"${filtered_df['total_bill'].mean():.2f}"
 )
 
-# Replace the single chart section with this:
+# you can create a side by side chart. so you present different data. Replace the single chart section with this:
 
 st.markdown('---')
 st.subheader('Charts')
@@ -100,7 +124,7 @@ with chart_col2:
     ax2.set_xlabel('Bill ($)')
     st.pyplot(fig2)
 
-# Replace the charts + dataframe sections with tabs:
+# you can create an organizer with tabs, so lets say you want to have a different tabs for different ways of showing data. Replace the charts + dataframe sections with tabs:
 
 tab1, tab2, tab3 = st.tabs(['Data', 'Charts', 'Scatter'])
 
@@ -133,3 +157,4 @@ with tab3:
 
 
 
+# we can create a side bar, so you can move controls out of the way
