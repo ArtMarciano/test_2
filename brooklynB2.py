@@ -13,6 +13,8 @@ def load_data():
 
 bridge = load_data()
 
+print(bridge)
+
 # ── Sidebar filters ───────────────────────────
 st.sidebar.header('Filters')
 
